@@ -10,4 +10,6 @@ type LexiconEntry struct {
 	Equivalent string `json:"equivalent"`
 	// tag list
 	Tags []string `json:"tags"`
+	// part of speech
+	Pos string `json:"pos"`
 }

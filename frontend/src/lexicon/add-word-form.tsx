@@ -25,7 +25,10 @@ const AddWordForm: React.FC<AddWordFormProps> = ({
   const [tags, setTags] = useState<string[]>(existingData?.tags ?? []);
   const [canAddWord, setCanAddWord] = useState<boolean>(false);
 
+  const [pos, setPos] = useState<string>(existingData?.pos ?? '');
+
   const availableGlobalTags = usePosAndTags(s => s.globalTags);
+  const availablePos = usePosAndTags(s => s.partsOfSpeech);
 
   const handleTagSubmit = (tag: string) => {
     if (!tags.includes(tag)) {
@@ -38,6 +41,7 @@ const AddWordForm: React.FC<AddWordFormProps> = ({
       headword,
       equivalent,
       tags,
+      pos,
     });
   };
 
@@ -53,9 +57,9 @@ const AddWordForm: React.FC<AddWordFormProps> = ({
 
   return (
     <Box>
-      <Box className="mb-4">
+      <Box className="mb-4 mt-2">
         <Typography variant="h5">Add a word</Typography>
-        <Typography variant="body1" className="mt-1">
+        <Typography variant="body1">
           Here you can add a word to your lexicon.
         </Typography>
       </Box>
@@ -82,20 +86,29 @@ const AddWordForm: React.FC<AddWordFormProps> = ({
         </Stack>
 
         <Stack className="mt-8" sx={{ width: '100%' }}>
-          <Typography variant="h6">Tags</Typography>
+          <Typography variant="h6">Tags & POS</Typography>
           <Typography variant="body1">
-            Here you can add or remove tags of your words, such as word classes,
-            which will affect your word's inflection later. Enter a tag and
-            press enter to add.
+            Here you can add or remove tags of your words, such as it's possible
+            loan origin. You can also assign your word a part of speech, and a
+            subtag for that part of speech. These can all later be used to
+            change how your word behaves in inflection, for example.
           </Typography>
 
           <TagInput
+            inputHint="Global tags"
             selectedTags={tags}
             onTagAdded={handleTagSubmit}
-            onTagRemoved={(tag, i) =>
-              setTags(tags.filter((v, idx) => idx !== i))
-            }
+            onTagRemoved={(_, i) => setTags(tags.filter((v, idx) => idx !== i))}
             availableTags={availableGlobalTags}
+          />
+
+          <TagInput
+            inputHint="Part of speech"
+            selectedTags={pos === '' ? [] : [pos]}
+            maxCount={1}
+            onTagAdded={tag => setPos(tag)}
+            onTagRemoved={() => setPos('')}
+            availableTags={availablePos}
           />
         </Stack>
 
@@ -107,7 +120,7 @@ const AddWordForm: React.FC<AddWordFormProps> = ({
               onClick={handleAddWord}
               disabled={!canAddWord}
             >
-              {existingData === null ? 'Edit word' : 'Add word'}
+              {existingData !== null ? 'Edit word' : 'Add word'}
             </Button>
           </Grid>
           <Grid>

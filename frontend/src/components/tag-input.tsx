@@ -10,17 +10,20 @@ import { useEffect, useState } from 'react';
 import { SlMinus } from 'react-icons/sl';
 
 export type TagInputProps = {
+  inputHint: string;
   selectedTags: string[];
   onTagAdded: (tag: string) => void;
   onTagRemoved: (tag: string, index: number) => void;
   availableTags?: string[];
   onSelectTag?: (tag?: string) => void;
   renderTagText?: (tag: string) => string;
+  maxCount?: number;
 };
 
 /**
  * An input for variable tags that can be applied on things.
  *
+ * @param inputHint passed to the placeholder property of the field
  * @param selectedTags the tags which are currently applied
  * @param onTagAdded called when a tag is added
  * @param onTagRemoved called when a tag is removed
@@ -28,14 +31,17 @@ export type TagInputProps = {
  *  and autocomplete is activated
  * @param onSelectTag optional parameter, when present allows clicking on the tags to select one at a time
  * @param renderTagText optional parameter, renders the tag's text with its name
+ * @param maxCount optional parameter, defines the max count of tags
  */
 const TagInput: React.FC<TagInputProps> = ({
+  inputHint,
   selectedTags,
   onTagAdded,
   onTagRemoved,
   availableTags,
   onSelectTag,
   renderTagText,
+  maxCount,
 }) => {
   // the current input value
   const [currentTag, setCurrentTag] = useState<string>('');
@@ -67,9 +73,11 @@ const TagInput: React.FC<TagInputProps> = ({
   return (
     <Stack sx={{ width: '100%' }}>
       <TagInputInternal
+        inputHint={inputHint}
         currentTag={currentTag}
         setCurrentTag={setCurrentTag}
         invalid={invalid}
+        disabled={selectedTags.length === maxCount}
         onTagAdded={() => {
           onTagAdded(renderTagText ? renderTagText(currentTag) : currentTag);
         }}
@@ -107,50 +115,74 @@ const TagInput: React.FC<TagInputProps> = ({
 };
 
 type TagInputInternalProps = {
+  inputHint: string;
   currentTag: string;
   setCurrentTag: (tag: string) => void;
   invalid: boolean;
   onTagAdded: () => void;
   allowedValues?: string[];
+  disabled: boolean;
 };
 
 const TagInputInternal: React.FC<TagInputInternalProps> = ({
+  inputHint,
   currentTag,
   setCurrentTag,
   invalid,
   onTagAdded,
   allowedValues,
+  disabled,
 }) => {
-  const unwrappedInput = (props: TextFieldProps) => (
+  const handleKeyDown = (keyEv: React.KeyboardEvent) => {
+    if (keyEv.key === 'Enter' && !invalid) {
+      setCurrentTag('');
+      onTagAdded();
+      keyEv.preventDefault();
+    }
+  };
+
+  const renderInput = (params: TextFieldProps) => (
     <TextField
-      {...props}
+      {...params}
       fullWidth
       sx={{ mt: 2 }}
-      label="Enter tag"
-      placeholder="Noun"
-      value={currentTag}
-      onChange={ev => setCurrentTag(ev.target.value)}
+      label={inputHint}
+      disabled={disabled}
       color={invalid ? 'error' : 'info'}
-      onKeyDown={keyEv => {
-        if (keyEv.key === 'Enter' && !invalid) {
-          setCurrentTag('');
-          onTagAdded();
-          keyEv.preventDefault();
-
-          return;
-        }
-      }}
+      onKeyDown={handleKeyDown}
     />
   );
 
   return allowedValues ? (
     <Autocomplete
       resetHighlightOnMouseLeave
+      freeSolo
       options={allowedValues}
-      renderInput={unwrappedInput}
+      inputValue={currentTag}
+      onInputChange={(_, newValue) => setCurrentTag(newValue)}
+      onChange={(_, newValue) => {
+        if (invalid) return;
+        if (typeof newValue === 'string') {
+          setCurrentTag(newValue);
+        }
+        // clear + commit on the same tick MUI resolves Enter/selection
+        setCurrentTag('');
+        onTagAdded();
+      }}
+      disabled={disabled}
+      renderInput={renderInput}
     />
   ) : (
-    unwrappedInput({})
+    <TextField
+      fullWidth
+      sx={{ mt: 2 }}
+      label={inputHint}
+      value={currentTag}
+      disabled={disabled}
+      color={invalid ? 'error' : 'info'}
+      onChange={ev => setCurrentTag(ev.target.value)}
+      onKeyDown={handleKeyDown}
+    />
   );
 };
 

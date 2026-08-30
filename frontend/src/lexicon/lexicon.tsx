@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  Divider,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -15,6 +17,7 @@ import AddWordForm from './add-word-form';
 import { createLexiconEntryId, useLexicon } from '../store';
 import type { LexiconEntry } from '../../bindings/vvalio.dev/nyelvin/lexicon';
 import { useShallow } from 'zustand/shallow';
+import { SlArrowLeft } from 'react-icons/sl';
 
 const Lexicon: React.FC = () => {
   const [isAddingWord, setIsAddingWord] = useState<boolean>(false);
@@ -55,11 +58,17 @@ const Lexicon: React.FC = () => {
   };
 
   return isAddingWord ? (
-    <AddWordForm
-      onWordAdd={handleAddWord}
-      existingData={editedWordData}
-      onCancel={() => setIsAddingWord(false)}
-    />
+    <Box>
+      <IconButton onClick={() => setIsAddingWord(false)}>
+        <SlArrowLeft size={14} className="mb-1" />
+      </IconButton>
+      <Divider variant="fullWidth" className="mb-1" />
+      <AddWordForm
+        onWordAdd={handleAddWord}
+        existingData={editedWordData}
+        onCancel={() => setIsAddingWord(false)}
+      />
+    </Box>
   ) : (
     <Box className="m-1">
       <Typography variant="h3">Lexicon</Typography>
@@ -76,6 +85,7 @@ const Lexicon: React.FC = () => {
           <TableHead>
             <TableRow>
               <TableCell width={1}>ID</TableCell>
+              <TableCell width={2}>POS</TableCell>
               <TableCell>Lemma</TableCell>
               <TableCell>Equivalent</TableCell>
             </TableRow>
@@ -85,6 +95,7 @@ const Lexicon: React.FC = () => {
               const id = word.id;
               const lemma = word.headword;
               const equivalent = word.equivalent;
+              const pos = word.pos;
 
               return (
                 <TableRow
@@ -92,6 +103,7 @@ const Lexicon: React.FC = () => {
                   onClick={() => handleEditWord(id)}
                 >
                   <TableCell>{id}</TableCell>
+                  <TableCell>{pos}</TableCell>
                   <TableCell>{lemma}</TableCell>
                   <TableCell>{equivalent}</TableCell>
                 </TableRow>

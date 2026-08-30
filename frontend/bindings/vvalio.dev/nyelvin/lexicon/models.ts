@@ -28,4 +28,9 @@ export interface LexiconEntry {
      * tag list
      */
     "tags": string[] | null;
+
+    /**
+     * part of speech
+     */
+    "pos": string;
 }

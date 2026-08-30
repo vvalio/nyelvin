@@ -33,6 +33,7 @@ const PartsOfSpeech: React.FC<PartsOfSpeechProps> = ({}) => {
       </Typography>
 
       <TagInput
+        inputHint="Global tag name"
         selectedTags={globalTags}
         onTagAdded={addGlobalTag}
         onTagRemoved={removeGlobalTag}
@@ -46,6 +47,7 @@ const PartsOfSpeech: React.FC<PartsOfSpeechProps> = ({}) => {
         </Typography>
 
         <TagInput
+          inputHint="Part of speech"
           selectedTags={partsOfSpeech}
           onTagAdded={pos => addPos(pos)}
           onTagRemoved={pos => removePos(pos)}
@@ -62,6 +64,7 @@ const PartsOfSpeech: React.FC<PartsOfSpeechProps> = ({}) => {
 
           {subtaggedPos ? (
             <TagInput
+              inputHint="Subtag name"
               selectedTags={posSubtags[subtaggedPos] ?? []}
               onTagAdded={tag => addPosSubtag(subtaggedPos, tag)}
               onTagRemoved={tag => removePosSubtag(subtaggedPos, tag)}
