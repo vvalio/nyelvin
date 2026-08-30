@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/source-serif-4/500.css";
+@import "@fontsource/source-serif-4/600.css";
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background-color: #faf7f2;
+  color: #262220;
+}
